@@ -6,7 +6,7 @@ Web Scraping en la página de estadísticas de Telegram [tgstat](https://tgstat.
 - Si tomamos el canal de Telegram de Xataka la URL sería la siguiente:
 https://tgstat.com/channel/@xataka
 
-- El nombre a introducir en el código sería el nombre del canal que viene después de la @ y que es el que aparece en Telegram en la descripción del canal de la siguiente manera:
+- El nombre a introducir en el código sería el nombre del canal que viene después de la @ y que es el mismo que aparece en Telegram en la descripción del canal de la siguiente manera:
 https://t.me/xataka
 
 - Una vez introducido el canal, el código descarga, por un lado, los nombres de los canales que han reenviado mensajes de Xataka en su canal. Por otro lado, descarga los canales de los que Xataka ha reenviado mensajes en su canal.

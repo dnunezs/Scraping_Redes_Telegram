@@ -17,7 +17,7 @@ https://t.me/xataka
 
 - El código está pensado para poder descargar la información de varios canales a la vez mediante un bucle, por lo que se podrían introducir infinitos canales.
 
-- El límite de canales que aparecen en la web en el apartado de reenvío de mensajes es de 50, por lo que si son canales muy prolíficos en reenvío de mensajes faltarán muchos canales
+- El límite de canales que aparecen en la web en el apartado de reenvío de mensajes es de 50, por lo que si son canales muy prolíficos en reenvío de mensajes faltarán muchos canales.
 
 - El código lo he usado para obtener un mapa de las relaciones entre canales de Telegram. Con él, he obtenido un dataset con más de 13.000 canales. Dado que tiene miles de canales negacionistas, Qanon, neonazis... he preferido no publicarlo para no darles ningún tipo de difusión. Si algún investigador está interesado en el dataset para no partir de cero estaré encantado de compartirlo (siempre que sea con fines de investigación).
 

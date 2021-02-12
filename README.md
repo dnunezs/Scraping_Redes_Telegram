@@ -9,7 +9,7 @@ https://tgstat.com/channel/@xataka
 - El nombre a introducir en el código sería el nombre del canal que viene después de la @ y que es el mismo que aparece en Telegram en la descripción del canal de la siguiente manera:
 https://t.me/xataka
 
-- Una vez introducido el canal, el código descarga, por un lado, los nombres de los canales que han reenviado mensajes de Xataka en su canal. Por otro lado, descarga los canales de los que Xataka ha reenviado mensajes en su canal.
+- Una vez introducido el canal (xataka en este caso), el código descarga, por un lado, los nombres de los canales que han reenviado mensajes de Xataka en su canal. Por otro lado, descarga los canales de los que Xataka ha reenviado mensajes en su canal.
 
 - Tras esto, se guardan todos los datos en un csv que se puede introducir directamente en [Gephi](https://gephi.org/) para su análisis.
 

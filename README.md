@@ -21,4 +21,4 @@ https://t.me/xataka
 
 - El código lo he usado para obtener un mapa de las relaciones entre canales de Telegram. Con él, he obtenido un dataset con más de 13.000 canales. Dado que tiene miles de canales negacionistas, Qanon, neonazis... he preferido no publicarlo para no darles ningún tipo de difusión. Si algún investigador está interesado en el dataset para no partir de cero estaré encantado de compartirlo (siempre que sea con fines de investigación).
 
-- El análisis del dataset lo podéis encontrar en mi cuenta de Twitter.
+- El análisis del dataset lo podéis encontrar en mi cuenta de [Twitter](https://twitter.com/_Daniel_Nunez/status/1360205515268251655)

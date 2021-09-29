@@ -1,34 +1,71 @@
-# Librerias ####
+#############################################################################################################################################
+# Librerias y datos
+#############################################################################################################################################
+# Limpiar el espacio de trabajo
+rm(list=ls())
+
+# importar librerias
 library(xml2)
 library(rvest)
 library(dplyr)
+library(readr)
+library(beepr)
+
+# Ruta de la carpeta del proyecto
+setwd("XXXXXXXXX")
+
+###########################################################################
+# Descarga de datos del Drive compartido                              #####
+###########################################################################
+
+# Carga del archivo: lista con los canales de telegram
+lista_canales <- read_csv("canales_telegram.csv")
 
 ###########################################################################
 # EXTRACCIÓN DE MENSAJES REENVIADOS EN BUCLE                           ####
 ###########################################################################
 
-# Hay que asegurarse de que los canales aparecen en la web tgstat.com sino hay que registrarlos
-# paro poder descargar la información
+# Creamos/vaciamos un data frame vacio donde iremos añadiendo los datos que descarguemos
+lista_actualizada <- data.frame()
 
-# Creamos un data frame vacio donde iremos añadiendo los datos que descarguemos
-DF_conjunto <- data.frame()
-
-# Anadimos la lista de los canales a descargar
-lista_canales <- c(  "Canal_1", "Canal_2", "Canal_3", "Canal_n")
+# Canales que no están en la web, no resgistrados o eliminados
+canales_fallo <-  c()
 
 # Ponemos la url generica de la web
 urltgstat_generica <- "https://tgstat.com/channel/@"
 
-# Hacemos un bucle para descarga la información de todos los canales
-for (i in 1:length(lista_canales)){
+# Hacemos un bucle para descargar la información de todos los canales
+for (i in 1:nrow(lista_canales)){
   # Segunda parte de la URL que se refiere al canal concreto
-  Canal <- lista_canales[i]
+  Canal <- as.character(lista_canales[i,1])
+  
+  perct <- round(i / nrow(lista_canales)*100, 2)
+  print(paste0(perct, "%. ","Canal: ", Canal, ". Nº: ", i, " de ", nrow(lista_canales), "." ))
   
   # Se unen las dos partes de la URL
   url_canal <- paste(urltgstat_generica, Canal, sep = "")
   
-  # cargamos la URL
-  Telegram <- read_html(url_canal)
+  fallo <- 0
+  
+  # cargamos la URL capturando los errores
+  fallo <- tryCatch(
+    {
+      Telegram <- read_html(url_canal)
+    },
+    error=function(cond) {
+      message(paste(Canal, "no está en la web."))
+      return(1)
+      
+    }
+
+  )
+  
+  # si no ha encontrado el canal lo guarda en otra lista y pasa al siguiente
+  if (as.character(fallo) == 1){
+    x <- length(canales_fallo) + 1
+    canales_fallo[x] <- Canal
+    next
+  } 
   
   # Descargamos los datos de los enlaces en la web que hacen referencia a los canales 
   Tlgm_links <- Telegram %>% 
@@ -60,7 +97,7 @@ for (i in 1:length(lista_canales)){
     # Eliminamos la parte del enlace para quedarnos solo con el nombre del canal
     df_Menciones$Target <-  gsub("https://tgstat.com/channel/", "", df_Menciones$Target)
     df_Menciones$Target <-  gsub("@", "", df_Menciones$Target)
-    DF_conjunto = rbind(DF_conjunto, df_Menciones)
+    lista_actualizada = rbind(lista_actualizada, df_Menciones)
     
   }
   
@@ -73,46 +110,63 @@ for (i in 1:length(lista_canales)){
     
     df_Mencionado$Source <-  gsub("https://tgstat.com/channel/", "", df_Mencionado$Source)
     df_Mencionado$Source <-  gsub("@", "", df_Mencionado$Source)
-    DF_conjunto = rbind(DF_conjunto, df_Mencionado)
+    lista_actualizada = rbind(lista_actualizada, df_Mencionado)
   }
+  
+  
   Sys.sleep(10)
+  
 }
+# Ejecutar junto con el bucle, ya que emite un sonido que nos avisará cuando acabe o se pare el bucle
+beep(sound = 1)
 
 # Limpieza posterior de algunos canales que tienen url estatales
+lista_actualizada$Source <-  gsub("https://tgstat.ru/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://tgstat.ru/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://tgstat.ru/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://tgstat.ru/en/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://ir.tgstat.com/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://ir.tgstat.com/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://ir.tgstat.com/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://ir.tgstat.com/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://uz.tgstat.com/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://uz.tgstat.com/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://uz.tgstat.com/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://uz.tgstat.com/en/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://uk.tgstat.com/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://uk.tgstat.com/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://uk.tgstat.com/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://uk.tgstat.com/en/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://by.tgstat.com/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://by.tgstat.com/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://by.tgstat.com/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://by.tgstat.com/en/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://cn.tgstat.com/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://cn.tgstat.com/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://cn.tgstat.com/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://cn.tgstat.com/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://et.tgstat.com/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://et.tgstat.com/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://et.tgstat.com/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://et.tgstat.com/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://in.tgstat.com/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://in.tgstat.com/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://in.tgstat.com/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://in.tgstat.com/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://kg.tgstat.com/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://kg.tgstat.com/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://kg.tgstat.com/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://kg.tgstat.com/en/channel/", "", DF_conjunto$Target)
+lista_actualizada$Source <-  gsub("https://kaz.tgstat.com/en/channel/", "", lista_actualizada$Source)
+lista_actualizada$Target <-  gsub("https://kaz.tgstat.com/en/channel/", "", lista_actualizada$Target)
 
-DF_conjunto$Source <-  gsub("https://kaz.tgstat.com/en/channel/", "", DF_conjunto$Source)
-DF_conjunto$Target <-  gsub("https://kaz.tgstat.com/en/channel/", "", DF_conjunto$Target)
+###########################################################################
+# Se crea una lista para hacer otra bola de nieve                      ####
+###########################################################################
 
 # Guardamos la base en CSV lista para cargar en Gephi
-write.csv(DF_conjunto, file = "Redes Telegram R.csv", row.names = FALSE)
+write.csv(lista_actualizada, file = "Dataset_Gephi_Telegram_2.csv", row.names = FALSE)
 
+# Creamos una nueva lista para hacer ejecutar otra vez el bucle y obtener más canales conectados
+lista_canales <- c(lista_actualizada$Source, lista_actualizada$Target)
+lista_canales <- unique(lista_canales)
+lista_canales
 
+# Guardamos la nueva lista de canales 
+write.csv(lista_canales, file = "lista_canales_2.csv", row.names = FALSE)
+
+# Guardamos la lista de canales que no están en la web
+write.csv(canales_fallo, file = "lista_canales_fallo_2.csv", row.names = FALSE)
 
 
